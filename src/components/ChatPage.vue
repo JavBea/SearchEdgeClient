@@ -19,7 +19,8 @@
 
       <!-- 右上角登录链接 -->
       <div class="login-link">
-        <a href="/login">登录</a>
+        <router-link to="/login">登录</router-link>
+        <router-view></router-view>
       </div>
 
       <!-- 四个选择设定小组件 -->

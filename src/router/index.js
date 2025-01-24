@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'  // Vue 3 用 create
 import Home from '../components/Home.vue'
 import About from '../components/About.vue'
 import ChatPage from '../components/ChatPage.vue'
+import LoginPage from '../components/LoginPage.vue'
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/chat',  // Chat 页面路径
     name: 'ChatPage',
     component: ChatPage
+  },
+  {
+    path: '/login',  // login 页面路径
+    name: 'LoginPage',
+    component: LoginPage
   }
 ]
 
