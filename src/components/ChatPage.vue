@@ -103,7 +103,8 @@ import { marked } from "marked";
 import HistoryPanel from './HistoryPanel.vue'; 
 
 // 引用Pinia store中的数据
-import {currentConversationIndexStore} from '../stores/currentConversationIndex';
+import {useCurrentConversationIndexStore} from '../stores/currentConversationIndex';
+import {useConversationsStore} from "@/stores/conversations";
 
 // 选择的大模型
 const llm = ref(null); 
@@ -121,9 +122,18 @@ export default {
     HistoryPanel
   },
   data() {
+
+    //Pinia store
+    const currentConversationIndexStore = useCurrentConversationIndexStore();
+    const conversationsStore = useConversationsStore();
+
     return {
 
-      currentConversationIndexStore: currentConversationIndexStore(),
+      //当前会话的索引store
+      currentConversationIndexStore,
+
+      //全部会话
+      conversations: conversationsStore.allConversations,
 
       func_on,
 
@@ -159,109 +169,6 @@ export default {
       postData: { query: 'Who are you?', llm: 'chatgpt', model:'gpt-4o', func_on:true, heu_on:true}, // 要发送到后端的数据
       response: null, // 用于保存后端返回的数据
 
-      // 历史对话数据：每个对话包含一个标题和多条消息
-      conversations: [
-        { 
-          title: '对话 1', // 对话标题
-          messages: [
-            { sender: '用户', text: '你好' }, // 用户的消息
-            { sender: '系统', text: '您好！有什么问题可以帮您解答？' } // 系统的回复
-          ]
-        },
-        { 
-          title: '对话 2',
-          messages: [
-            { sender: '用户', text: '今天的天气怎么样？' },
-            { sender: '系统', text: '今天是晴天，温度适宜。' }
-          ]
-        },
-        { 
-          title: '对话 3',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 4',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 5',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 6',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 7',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 8',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 9',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 10',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 11',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 12',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 13',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        },
-        { 
-          title: '对话 14',
-          messages: [
-            { sender: '用户', text: '你能做什么？' },
-            { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-          ]
-        }
-      ],
-      // 当前选中的对话索引，初始值为第一个对话
-      // currentConversationIndex: 0,
       // 新消息输入框中的内容
       newMessage: '',
       // 后端传入的新消息中的内容

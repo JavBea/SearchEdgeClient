@@ -20,115 +20,124 @@
 // import { marked } from "marked";
 
 // 引用Pinia store中的数据
-import {currentConversationIndexStore} from '@/stores/currentConversationIndex';
+import {useCurrentConversationIndexStore} from '@/stores/currentConversationIndex';
+import {useConversationsStore} from "@/stores/conversations";
 
 export default {
     data() {
+        //Pinia store
+        const currentConversationIndexStore = useCurrentConversationIndexStore();
+        const conversationsStore = useConversationsStore();
+
         return {
-        // 引用Pinia中的数据
-          currentConversationIndexStore: currentConversationIndexStore(),
+
+          //当前会话的索引store
+          currentConversationIndexStore,
+
+          //全部会话
+          conversations: conversationsStore.allConversations,
         
         // 历史对话数据：每个对话包含一个标题和多条消息
-        conversations: [
-            { 
-            title: '对话 1', // 对话标题
-            messages: [
-                { sender: '用户', text: '你好' }, // 用户的消息
-                { sender: '系统', text: '您好！有什么问题可以帮您解答？' } // 系统的回复
-            ]
-            },
-            { 
-            title: '对话 2',
-            messages: [
-                { sender: '用户', text: '今天的天气怎么样？' },
-                { sender: '系统', text: '今天是晴天，温度适宜。' }
-            ]
-            },
-            { 
-            title: '对话 3',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 4',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 5',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 6',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 7',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 8',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 9',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 10',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 11',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 12',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 13',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            },
-            { 
-            title: '对话 14',
-            messages: [
-                { sender: '用户', text: '你能做什么？' },
-                { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-            ]
-            }
-        ],
+        //   conversations: [
+        //     {
+        //       title: '对话 1', // 对话标题
+        //       messages: [
+        //         { sender: '用户', text: '你好' }, // 用户的消息
+        //         { sender: '系统', text: '您好！有什么问题可以帮您解答？' } // 系统的回复
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 2',
+        //       messages: [
+        //         { sender: '用户', text: '今天的天气怎么样？' },
+        //         { sender: '系统', text: '今天是晴天，温度适宜。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 3',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 4',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 5',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 6',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 7',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 8',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 9',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 10',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 11',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 12',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 13',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     },
+        //     {
+        //       title: '对话 14',
+        //       messages: [
+        //         { sender: '用户', text: '你能做什么？' },
+        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
+        //       ]
+        //     }
+        //   ],
         };
     },
 
