@@ -14,7 +14,15 @@ import router from './router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
+//导入Pinia
+import { createPinia } from 'pinia'
+
+
+const pinia = createPinia()
 const app = createApp(App)
+
+
 app.use(router)  // 使用路由
+app.use(pinia)  // 使用 pinia
 app.use(ElementPlus)  // 使用 ElementPlus
 app.mount('#app')  // 挂载到 DOM 元素

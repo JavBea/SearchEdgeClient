@@ -1,19 +1,7 @@
 <template>
   <div class="chat-container">
     <!-- 左侧：历史对话选择栏 -->
-    <div class="history-panel">
-      <h3>历史对话</h3>
-      <ul>
-        <li
-          v-for="(conversation, index) in conversations"
-          :key="index"
-          @click="selectConversation(index)"
-        >
-          {{ conversation.title }}
-        </li>
-      </ul>
-    </div>
-
+    <HistoryPanel></HistoryPanel>
     <!-- 右侧：对话部分 -->
     <div class="chat-panel">
 
@@ -111,7 +99,11 @@
 import axios from 'axios';
 import {ref} from 'vue';
 // 使用 marked 库解析 Markdown
-import { marked } from "marked"; 
+import { marked } from "marked";
+import HistoryPanel from './HistoryPanel.vue'; 
+
+// 引用Pinia store中的数据
+import {currentConversationIndexStore} from '../stores/currentConversationIndex';
 
 // 选择的大模型
 const llm = ref(null); 
@@ -124,8 +116,14 @@ const func_on = ref(true);
 const heu_on = ref(true);
 
 export default {
+  name: 'ChatPage',
+  components: {
+    HistoryPanel
+  },
   data() {
     return {
+
+      currentConversationIndexStore: currentConversationIndexStore(),
 
       func_on,
 
@@ -263,7 +261,7 @@ export default {
         }
       ],
       // 当前选中的对话索引，初始值为第一个对话
-      currentConversationIndex: 0,
+      // currentConversationIndex: 0,
       // 新消息输入框中的内容
       newMessage: '',
       // 后端传入的新消息中的内容
@@ -273,9 +271,9 @@ export default {
 
   computed: {
 
-    // 计算属性：当前选中的对话，根据 currentConversationIndex 返回对应的对话
+    // 计算属性：当前选中的对话，通过Pinia currentConversationIndexStore 返回对应的对话
     currentConversation() {
-      return this.conversations[this.currentConversationIndex];
+      return this.conversations[this.currentConversationIndexStore.index];
     },
 
     // 计算属性，返回根据第一个 select 的值过滤后的第二个 select 的选项
@@ -340,8 +338,8 @@ export default {
     },
     // 选择历史对话的方法
     selectConversation(index) {
-      // 更新当前选中的对话索引为用户点击的对话索引
-      this.currentConversationIndex = index;
+      // 通过Pinia store 更新当前选中的对话索引为用户点击的对话索引
+      this.currentConversationIndexStore.setIndex(index);
     },
     // 发送消息的方法
     sendMessage() {
