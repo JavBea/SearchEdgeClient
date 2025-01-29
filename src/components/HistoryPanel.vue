@@ -3,11 +3,11 @@
         <h3>历史对话</h3>
         <ul>
             <li
-                v-for="(conversation, index) in conversations"
-                :key="index"
-                @click="selectConversation(index)"
+                v-for="conversation in conversations"
+                :key="conversation.conversation_id"
+                @click="selectConversation(conversation.conversation_id)"
             >
-                {{ conversation.title }}
+              {{ conversation.title }}
             </li>
         </ul>
     </div>
@@ -20,19 +20,23 @@
 // import { marked } from "marked";
 
 // 引用Pinia store中的数据
-import {useCurrentConversationIndexStore} from '@/stores/currentConversationIndex';
+import {useCurrentConversationStore} from '@/stores/currentConversation';
 import {useConversationsStore} from "@/stores/conversations";
+import {useCurrentMessagesStore} from "@/stores/currentMessages";
 
 export default {
     data() {
         //Pinia store
-        const currentConversationIndexStore = useCurrentConversationIndexStore();
+        const currentConversationStore = useCurrentConversationStore();
         const conversationsStore = useConversationsStore();
+        const currentMessagesStore = useCurrentMessagesStore();
 
         return {
 
-          //当前会话的索引store
-          currentConversationIndexStore,
+          //Pinia store
+          currentConversationStore,
+          currentMessagesStore,
+          conversationsStore,
 
           //全部会话
           conversations: conversationsStore.allConversations,
@@ -144,10 +148,20 @@ export default {
     methods: {
         
         // 选择历史对话的方法
-        selectConversation(index) {
-            // 通过Pinia store 更新当前选中的对话索引为用户点击的对话索引
-            this.currentConversationIndexStore.setIndex(index);
+        // selectConversation(index) {
+        //     //更新当前选中的对话索引为用户点击的对话索引
+        //     this.currentConversationIndexStore.setIndex(index);
+        // },
+        // 根据ID选择历史对话的方法
+        selectConversation(conversation_id) {
+            //更新当前选中的对话索引为用户点击的对话索引
+            this.currentConversationStore.setConversationId(conversation_id);
+            this.currentMessagesStore.fetchMessages(conversation_id);
         },
+    },
+    created() {
+      this.conversationsStore.fetchData('10000002');
+      this.conversations=this.conversationsStore.allConversations;
     }
 };
 </script>
