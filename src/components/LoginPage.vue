@@ -1,11 +1,11 @@
 <template>
-    <div class="login-container">
-      <el-card class="login-card" shadow="hover">
-        <h2 class="login-title">登录</h2>
+    <div class="register-container">
+      <el-card class="register-card" shadow="hover">
+        <h2 class="register-title">登录</h2>
         <el-form :model="loginForm" :rules="rules" ref="loginFormRef" label-width="80px">
           <!-- 用户名 -->
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="loginForm.username" placeholder="请输入用户名" />
+          <el-form-item label="用户名" prop="token">
+            <el-input v-model="loginForm.token" placeholder="请输入用户名" />
           </el-form-item>
           <!-- 密码 -->
           <el-form-item label="密码" prop="password">
@@ -14,7 +14,9 @@
           <!-- 按钮 -->
           <div class="button-group">
             <el-button type="primary" @click="handleLogin">登录</el-button>
-            <el-button @click="handleReset">重置</el-button>
+            <router-link to="/register">
+              <el-button>注册</el-button>
+            </router-link>
           </div>
         </el-form>
       </el-card>
@@ -22,55 +24,59 @@
   </template>
   
   <script>
-  import { reactive, ref } from "vue";
-  
+  import {ElMessage} from "element-plus";
+  import {useUserStore} from "@/stores/user.js";
   export default {
     name: "LoginPage",
-    setup() {
-      // 登录表单数据
-      const loginForm = reactive({
-        username: "",
-        password: "",
-      });
-  
-      // 表单校验规则
-      const rules = {
-        username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+    data() {
+      return {
+        loginForm: {
+          token: "",
+          password: "",
+        },
+        rules: {
+          token: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+          password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        },
+        loginFormRef: null,
+        userStore: null,
       };
-  
-      const loginFormRef = ref(null);
-  
-      // 登录方法
-      const handleLogin = () => {
-        loginFormRef.value.validate((valid) => {
-          if (valid) {
-            alert("登录成功！");
-          } else {
-            console.log("登录表单验证失败");
+    },
+    created() {
+      this.userStore = useUserStore();
+    },
+    methods: {
+      handleLogin() {
+        this.$refs.loginFormRef.validate(async (valid) => {
+          if (!valid) return;
+
+          this.userStore.setLoading(true);
+
+          try {
+            if (await this.userStore.login(this.loginForm.token, this.loginForm.password)) {
+              ElMessage.success("登录成功！");
+              await this.$router.push("/");
+            } else {
+              ElMessage.error("登录失败");
+            }
+          } catch (error) {
+            ElMessage.error("登录失败");
+          } finally {
+            this.userStore.setLoading(false);
           }
         });
-      };
-  
-      // 重置方法
-      const handleReset = () => {
-        loginForm.username = "";
-        loginForm.password = "";
-      };
-  
-      return {
-        loginForm,
-        rules,
-        loginFormRef,
-        handleLogin,
-        handleReset,
-      };
+      },
+      handleRegister() {
+        this.$router.push("/register");
+        this.loginForm.token = "";
+        this.loginForm.password = "";
+      },
     },
   };
   </script>
   
   <style scoped>
-  .login-container {
+  .register-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,12 +84,12 @@
     background-color: #f5f5f5;
   }
   
-  .login-card {
+  .register-card {
     width: 400px;
     padding: 20px;
   }
   
-  .login-title {
+  .register-title {
     text-align: center;
     margin-bottom: 20px;
     color: #333;

@@ -5,64 +5,66 @@
     <!-- 右侧：对话部分 -->
     <div class="chat-panel">
 
-      <!-- 右上角登录链接 -->
-      <div class="login-link">
-        <router-link to="/login">登录</router-link>
-        <router-view></router-view>
+    <!-- 右上角登录链接 -->
+
+      <div v-if="userStore.user?.user_name" class="user-avatar">
+        <el-avatar class="avatar">{{ userStore.user.user_name.charAt(0).toUpperCase() }}</el-avatar>
       </div>
+      <div v-else class="login-link">
+        <router-link to="/login">登录</router-link>
+      </div>
+    <!-- 四个选择设定小组件 -->
+      <div class="choice-set-container">
+        <!-- 第一个组件：选择大模型系列 -->
+        <el-select
+          v-model=llm
+          placeholder="Select"
+          size="large"
+          style="width: 120px"
+          @change="modelDefaultSelect"
+        >
+          <el-option
+            v-for="item in llm_options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
 
-      <!-- 四个选择设定小组件 -->
-        <div class="choice-set-container">
-          <!-- 第一个组件：选择大模型系列 -->
-          <el-select
-            v-model=llm
-            placeholder="Select"
-            size="large"
-            style="width: 120px"
-            @change="modelDefaultSelect"
-          >
-            <el-option
-              v-for="item in llm_options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-
-          <div style="padding: 10px;"></div>
+        <div style="padding: 10px;"></div>
 
 
-          <!-- 第二个组件：选择具体模型 -->
-          <el-select
-            v-model=model
-            placeholder="Select"
-            size="large"
-            style="width: 120px"
-            :disabled="!llm"
-          >
-            <el-option
-              v-for="item in filteredModelOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          
-          <div style="padding: 10px;"></div>
+        <!-- 第二个组件：选择具体模型 -->
+        <el-select
+          v-model=model
+          placeholder="Select"
+          size="large"
+          style="width: 120px"
+          :disabled="!llm"
+        >
+          <el-option
+            v-for="item in filteredModelOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
 
-          <el-text>
-            函数调用
-            <el-switch v-model="func_on" />
-          </el-text>
+        <div style="padding: 10px;"></div>
 
-          <div style="padding: 7px;"></div>
+        <el-text>
+          函数调用
+          <el-switch v-model="func_on" />
+        </el-text>
 
-          <el-text>
-            启发式规则
-            <el-switch v-model="heu_on" />
-          </el-text>
+        <div style="padding: 7px;"></div>
 
-        </div>        
+        <el-text>
+          启发式规则
+          <el-switch v-model="heu_on" />
+        </el-text>
+
+      </div>
 
       <!-- 显示对话内容 -->
       <div class="chat-content">
@@ -79,7 +81,6 @@
           <!-- 显示发送者的名字 -->
           <strong>{{ message.sender }}:</strong>
           <!-- 显示消息的内容 -->
-<!--          <div v-html="message.text"></div>-->
           <div v-html="message.message_content"></div>
         </div>
       </div>
@@ -104,7 +105,7 @@ import HistoryPanel from './HistoryPanel.vue';
 // 引用Pinia store中的数据
 import {useCurrentConversationStore} from '../stores/currentConversation';
 import {useConversationsStore} from "@/stores/conversations";
-import {useCurrentUserStore} from "@/stores/currentUser";
+import {useUserStore} from "@/stores/user.js";
 import {useCurrentMessagesStore} from "@/stores/currentMessages";
 
 // 选择的大模型
@@ -125,13 +126,12 @@ export default {
   created() {
     this.currentConversationStore = useCurrentConversationStore();
     this.conversationsStore = useConversationsStore();
-    this.userStore = useCurrentUserStore();
+    this.userStore = useUserStore();
     this.currentMessagesStore = useCurrentMessagesStore();
 
+    this.conversationsStore.fetchData(this.userStore.user.user_id);
     this.conversations=this.conversationsStore.allConversations;
-
-    this.conversationsStore.fetchData('10000002');
-    this.currentMessagesStore.fetchMessages('10001');
+    this.currentMessagesStore.fetchMessages(this.conversations?.[0]?.id);
   },
   data() {
 
@@ -542,6 +542,31 @@ export default {
     border-color: transparent  transparent #5a64c1 transparent ;
 }
 
+
+ .header {
+   display: flex;
+ }
+
+ .user-avatar {
+   position: absolute;
+   right: 20px;
+   top: 20px;
+   font-size: 14px;
+   margin-bottom: 10px;
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   background-color: #2980b9;
+   color: white;
+   font-size: 18px;
+   font-weight: bold;
+ }
+
+ .avatar {
+   background-color: #2980b9 !important;
+   color: white !important;
+   font-size: 18px !important;
+ }
 
 </style>
   

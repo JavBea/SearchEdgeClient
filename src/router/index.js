@@ -4,10 +4,11 @@ import Home from '../components/Home.vue'
 import About from '../components/About.vue'
 import ChatPage from '../components/ChatPage.vue'
 import LoginPage from '../components/LoginPage.vue'
+import RegisterPage from '../components/RegisterPage.vue'
 
 const routes = [
   {
-    path: '/',  // 根路径
+    path: '/home',  // 根路径
     name: 'HomePage',
     component: Home
   },
@@ -17,14 +18,19 @@ const routes = [
     component: About
   },
   {
-    path: '/chat',  // Chat 页面路径
+    path: '/',  // Chat 页面路径
     name: 'ChatPage',
     component: ChatPage
   },
   {
+    path: '/register',  // Register 页面路径
+    name: 'RegisterPage',
+    component: RegisterPage
+  },
+  {
     path: '/login',  // login 页面路径
     name: 'LoginPage',
-    component: LoginPage
+    component: LoginPage,
   }
 ]
 
