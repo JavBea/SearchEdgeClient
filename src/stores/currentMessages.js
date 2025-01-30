@@ -17,6 +17,7 @@ export const useCurrentMessagesStore = defineStore('currentMessages', {
             try {
                 const response = await axios.post('http://127.0.0.1:5000/message/getallmessages',{"conversation_id":conversation_id});
                 this.messages = response.data;
+                return this.messages;
             } catch (error) {
                 this.error = error;
                 console.error(error);

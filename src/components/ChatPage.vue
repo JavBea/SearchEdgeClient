@@ -68,7 +68,7 @@
       <div class="chat-content">
         <!-- 遍历 currentConversation.messages 数组，每个元素对应一条消息 -->
         <div
-          v-for="(message, index) in currentMessagesStore.messages"
+          v-for="(message, index) in currentMessages"
           :key="index"
           class="message"
           :class="{
@@ -136,10 +136,6 @@ export default {
   data() {
 
     //Pinia store
-    // const currentConversationStore = useCurrentConversationStore();
-    // const conversationsStore = useConversationsStore();
-    // const userStore = useCurrentUserStore();
-    // const currentMessagesStore = useCurrentMessagesStore();
 
     return {
 
@@ -151,13 +147,9 @@ export default {
 
       //全部会话
       conversations: null,
-      // conversations: conversationsStore.allConversations,
 
       //当前登录的用户
       // currentUser: userStore.getCurrentUser,
-
-      //当前会话的全部消息
-      currentMessages:null,
 
       func_on,
 
@@ -190,7 +182,7 @@ export default {
         ]
       },
 
-      postData: { query: 'Who are you?', llm: 'chatgpt', model:'gpt-4o', func_on:true, heu_on:true}, // 要发送到后端的数据
+      postData: { conversation_id:null, query: 'Who are you?', llm: 'chatgpt', model:'gpt-4o', func_on:true, heu_on:true}, // 要发送到后端的数据
       response: null, // 用于保存后端返回的数据
 
       // 新消息输入框中的内容
@@ -206,6 +198,12 @@ export default {
       return this.conversationsStore.getConversationById(this.currentConversationStore.getCurrentConversationId)
     },
 
+    // 计算属性：当前选中的对话中的信息
+    currentMessages() {
+      //获取信息并返回
+      return this.currentMessagesStore.messages;
+    },
+
     // 计算属性，返回根据第一个 select 的值过滤后的第二个 select 的选项
     filteredModelOptions() {
       if (this.llm) {
@@ -217,7 +215,6 @@ export default {
 
   },
   methods: {
-    
     // 计算“具体模型选择”的默认属性
     modelDefaultSelect(value) {
       if (this.llm && this.model_options[this.llm] && this.model_options[this.llm].length > 0) {
@@ -228,15 +225,17 @@ export default {
       console.log("选中的值是：", value);
       // 在这里可以执行其他逻辑
     },
+    // 发送请求方法
     async sendPostRequest() {
       
       // 检查 newMessage 是否为空或仅包含空格
       if (this.newMessage.trim()) {
         // 构造一条新消息
-        const newMsg = { sender: 'user', text: marked(this.newMessage) };
+        const newMsg = { sender: 'user', message_content: marked(this.newMessage) };
         // 将新消息添加到当前对话的消息列表中
-        this.currentConversation.messages.push(newMsg);
+        this.currentMessagesStore.messages.push(newMsg);
         // 更新要发送到后端的数据
+        this.postData.conversation_id = this.currentConversationStore.conversation_id;
         this.postData.query = this.newMessage;
         this.postData.llm = this.llm;
         this.postData.model = this.model;
@@ -253,8 +252,8 @@ export default {
         this.response = res.data; 
         // 将后端返回的消息添加到当前对话的消息列表中
         this.responseMessage = marked(this.response.content);
-        const newMsg = { sender: 'system', text: this.responseMessage };
-        this.currentConversation.messages.push(newMsg);
+        const newMsg = { sender: 'system', message_content: this.responseMessage };
+        this.currentMessagesStore.messages.push(newMsg);
 
         console.log('后端响应:', this.response);
 
@@ -265,23 +264,6 @@ export default {
       }
       this.postData.query = 'Who are you?'; // 重置 query 字段
     },
-    // // 选择历史对话的方法
-    // selectConversation(index) {
-    //   // 通过Pinia store 更新当前选中的对话索引为用户点击的对话索引
-    //   this.currentConversationStore.setIndex(index);
-    // },
-    // // 发送消息的方法
-    // sendMessage() {
-    //   // 检查 newMessage 是否为空或仅包含空格
-    //   if (this.newMessage.trim()) {
-    //     // 构造一条新消息
-    //     const newMsg = { sender: '用户', text: this.newMessage };
-    //     // 将新消息添加到当前对话的消息列表中
-    //     this.currentConversation.messages.push(newMsg);
-    //     // 清空输入框
-    //     this.newMessage = '';
-    //   }
-    // }
   },
   //钩子函数
   mounted() {

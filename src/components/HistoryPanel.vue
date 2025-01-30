@@ -4,8 +4,8 @@
         <ul>
             <li
                 v-for="conversation in conversations"
-                :key="conversation.conversation_id"
-                @click="selectConversation(conversation.conversation_id)"
+                :key="conversation.id"
+                @click="selectConversation(conversation.id)"
             >
               {{ conversation.title }}
             </li>
@@ -37,133 +37,31 @@ export default {
           currentConversationStore,
           currentMessagesStore,
           conversationsStore,
-
-          //全部会话
-          conversations: conversationsStore.allConversations,
-        
-        // 历史对话数据：每个对话包含一个标题和多条消息
-        //   conversations: [
-        //     {
-        //       title: '对话 1', // 对话标题
-        //       messages: [
-        //         { sender: '用户', text: '你好' }, // 用户的消息
-        //         { sender: '系统', text: '您好！有什么问题可以帮您解答？' } // 系统的回复
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 2',
-        //       messages: [
-        //         { sender: '用户', text: '今天的天气怎么样？' },
-        //         { sender: '系统', text: '今天是晴天，温度适宜。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 3',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 4',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 5',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 6',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 7',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 8',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 9',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 10',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 11',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 12',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 13',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     },
-        //     {
-        //       title: '对话 14',
-        //       messages: [
-        //         { sender: '用户', text: '你能做什么？' },
-        //         { sender: '系统', text: '我可以帮助你回答问题、做任务等。' }
-        //       ]
-        //     }
-        //   ],
         };
+    },
+    computed: {
+
+        // 全部的对话
+        conversations() {
+          return this.conversationsStore.allConversations
+        },
+
     },
 
     methods: {
-        
-        // 选择历史对话的方法
-        // selectConversation(index) {
-        //     //更新当前选中的对话索引为用户点击的对话索引
-        //     this.currentConversationIndexStore.setIndex(index);
-        // },
+
         // 根据ID选择历史对话的方法
         selectConversation(conversation_id) {
-            //更新当前选中的对话索引为用户点击的对话索引
+            //更新当前选中的对话ID
             this.currentConversationStore.setConversationId(conversation_id);
+            //更新当前对话的全部信息
             this.currentMessagesStore.fetchMessages(conversation_id);
         },
     },
     created() {
       this.conversationsStore.fetchData('10000002');
-      this.conversations=this.conversationsStore.allConversations;
     }
-};
+  };
 </script>
 
 <style>

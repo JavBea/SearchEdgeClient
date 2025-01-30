@@ -4,49 +4,8 @@ import axios from 'axios';
 
 export const useConversationsStore = defineStore('conversations', {
     state: () => ({
+        //会话列表
         conversations : null,
-        // conversations: [
-        //     {
-        //         title: '对话 10', // 对话标题
-        //         messages: [
-        //             { sender: 'user', text: '你好' }, // 用户的消息
-        //             { sender: 'system', text: '您好！有什么问题可以帮您解答？' } // 系统的回复
-        //         ],
-        //         conversation_id:10001,
-        //     },
-        //     {
-        //         title: '对话 2',
-        //         messages: [
-        //             { sender: 'user', text: '今天的天气怎么样？' },
-        //             { sender: 'system', text: '今天是晴天，温度适宜。' }
-        //         ],
-        //         conversation_id:10002,
-        //     },
-        //     {
-        //         title: '对话 3',
-        //         messages: [
-        //             { sender: 'user', text: '你能做什么？' },
-        //             { sender: 'system', text: '我可以帮助你回答问题、做任务等。' }
-        //         ],
-        //         conversation_id:10003,
-        //     },
-        //     {
-        //         title: '对话 4',
-        //         messages: [
-        //             { sender: 'user', text: '你能做什么？' },
-        //             { sender: 'system', text: '我可以帮助你回答问题、做任务等。' }
-        //         ],
-        //         conversation_id:10004,
-        //     },
-        //     {
-        //         title: '对话 5',
-        //         messages: [
-        //             { sender: 'user', text: '你能做什么？' },
-        //             { sender: 'system', text: '我可以帮助你回答问题、做任务等。' }
-        //         ],
-        //         conversation_id:10005,
-        //     },
-        // ],
         //“加载中”标志
         loading : false,
         //错误信息
