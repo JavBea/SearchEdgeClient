@@ -1,31 +1,40 @@
 <template>
-  <div class="history-panel" :class="{'collapsed': isCollapsed}">
-    <!-- 顶部区域，包含加号图标 -->
-    <div class="header">
-      
+  <el-menu :collapse="isCollapsed">
+
+    <el-menu-item v-if="isCollapsed">
       <el-button :icon="OfficeBuilding" @click="togglePanel" circle />
-      <el-button :icon="Plus" circle />
-      <!-- <button class="icon-button">+</button> -->
-      <!-- <button class="icon-button">+</button> -->
+    </el-menu-item>
+
+
+    <div class="history-panel" :class="{'collapsed': isCollapsed}">
+      <!-- 顶部区域，包含加号图标 -->
+      <div class="header">
+        <el-button :icon="OfficeBuilding" @click="togglePanel" circle />
+        <el-button :icon="Plus" circle />
+      </div>
+
+      <h3 v-if="!isCollapsed">历史对话</h3>
+      <ul v-if="!isCollapsed">
+        <li
+          v-for="conversation in conversations"
+          :key="conversation.id"
+          @click="selectConversation(conversation.id)"
+        >
+          {{ conversation.title }}
+        </li>
+      </ul>
+
     </div>
-    
-    <h3 v-if="!isCollapsed">历史对话</h3>
-    <ul v-if="!isCollapsed">
-      <li
-        v-for="conversation in conversations"
-        :key="conversation.id"
-        @click="selectConversation(conversation.id)"
-      >
-        {{ conversation.title }}
-      </li>
-    </ul>
-  </div>
+
+  </el-menu>
+
 </template>
 
 <script>
 import { useCurrentConversationStore } from '@/stores/currentConversation';
 import { useConversationsStore } from "@/stores/conversations";
 import { useCurrentMessagesStore } from "@/stores/currentMessages";
+import { useStatusStore } from "@/stores/status.js";
 import { Plus,OfficeBuilding} from '@element-plus/icons-vue';
 
 export default {
@@ -33,25 +42,31 @@ export default {
     const currentConversationStore = useCurrentConversationStore();
     const conversationsStore = useConversationsStore();
     const currentMessagesStore = useCurrentMessagesStore();
+    const statusStore = useStatusStore();
 
     return {
       currentConversationStore,
       currentMessagesStore,
       conversationsStore,
+      statusStore,
       Plus,
       OfficeBuilding,
-      isCollapsed: false, // 控制面板是否收起
+      // isCollapsed: ref(statusStore.isCollapsed), // 控制面板是否收起
     };
   },
   computed: {
     conversations() {
       return this.conversationsStore.allConversations;
     },
+    isCollapsed(){
+      return this.statusStore.isCollapsed;
+    }
   },
   methods: {
     // 切换历史对话栏的显示/隐藏
     togglePanel() {
-      this.isCollapsed = !this.isCollapsed;
+      this.statusStore.collapse();
+      // this.isCollapsed = !this.isCollapsed;
     },
     selectConversation(conversation_id) {
       this.currentConversationStore.setConversationId(conversation_id);
