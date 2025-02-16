@@ -26,6 +26,8 @@
   <script>
   import {ElMessage} from "element-plus";
   import {useUserStore} from "@/stores/user.js";
+  import {useConversationsStore} from "@/stores/conversations.js";
+
   export default {
     name: "LoginPage",
     data() {
@@ -44,6 +46,7 @@
     },
     created() {
       this.userStore = useUserStore();
+      this.conversationsStore = useConversationsStore();
     },
     methods: {
       handleLogin() {
@@ -53,8 +56,10 @@
           this.userStore.setLoading(true);
 
           try {
-            if (await this.userStore.login(this.loginForm.token, this.loginForm.password)) {
+            this.userStore.setUser(await this.userStore.login(this.loginForm.token, this.loginForm.password))
+            if (this.userStore.user) {
               ElMessage.success("登录成功！");
+              await this.conversationsStore.fetchData(this.userStore.user.user_id)
               await this.$router.push("/");
             } else {
               ElMessage.error("登录失败");

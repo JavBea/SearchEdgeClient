@@ -163,7 +163,7 @@ export default {
       llm_options: [
         { label: 'ChatGPT', value: 'chatgpt' },
         { label: '通义千问', value: 'qwen' },
-        { label: '系列3', value: 'series3' }
+        { label: 'DeepSeek', value: 'deepseek' }
       ],
 
       // 根据大模型系列选择的具体模型选项
@@ -176,9 +176,9 @@ export default {
           { label: 'qwen-plus', value: 'qwen-plus' },
           { label: '模型2-2', value: 'model2-2' }
         ],
-        series3: [
-          { label: '模型3-1', value: 'model3-1' },
-          { label: '模型3-2', value: 'model3-2' }
+        deepseek: [
+          { label: 'DeepSeek-r1:7b', value: 'deepseek-r1:7b' },
+          { label: 'DeepSeek-r1:32b', value: 'DeepSeek-r1:32b' }
         ]
       },
 

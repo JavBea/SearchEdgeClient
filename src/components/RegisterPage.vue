@@ -59,7 +59,7 @@ export default {
         try {
           if (await this.userStore.register(this.registerForm.username, this.registerForm.email, this.registerForm.password)) {
             ElMessage.success("注册成功！");
-            await this.$router.push("/");
+            await this.$router.push("/login");
           } else {
             ElMessage.error("注册失败");
           }
@@ -71,9 +71,7 @@ export default {
       });
     },
     handleToLogin() {
-      this.registerForm.username = "";
-      this.registerForm.email = "";
-      this.registerForm.password = "";
+      this.$router.push("/login");
     },
   },
 };
