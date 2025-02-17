@@ -8,5 +8,5 @@ module.exports = defineConfig({
         '@vue/compiler-sfc': require.resolve('@vue/compiler-sfc')
       }
     }
-  }
+  },
 })

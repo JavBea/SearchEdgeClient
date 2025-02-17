@@ -104,17 +104,6 @@ export default {
   background-color: #fff; 
 }
 
-.icon-button {
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-
-.icon-button:hover {
-  background-color: #dcdcdc; /* 鼠标悬停时背景变深 */
-}
 
 /* 标题样式 */
 .history-panel h3 {

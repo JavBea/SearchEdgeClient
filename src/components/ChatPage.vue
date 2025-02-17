@@ -64,6 +64,8 @@
           <el-switch v-model="heu_on" />
         </el-text>
 
+        <el-button  :icon="Setting" @click="openHeuSettings" circle></el-button>
+
       </div>
 
       <!-- 显示对话内容 -->
@@ -88,7 +90,7 @@
       <!-- 输入框 -->
       <div class="input-area">
         <textarea v-model="newMessage" placeholder="输入消息..." rows="3"></textarea>
-        <button @click="sendPostRequest">发送</button>
+        <el-button @click="sendPostRequest" class=".sendbutton" round>发送</el-button>
       </div>
     </div>
   </div>
@@ -97,16 +99,19 @@
 <script>
 // 引入 axios
 import axios from 'axios';
-import {ref} from 'vue';
+import {h, ref} from 'vue';
 // 使用 marked 库解析 Markdown
 import { marked } from "marked";
 import HistoryPanel from './HistoryPanel.vue'; 
 
 // 引用Pinia store中的数据
-import {useCurrentConversationStore} from '../stores/currentConversation';
+import {useCurrentConversationStore} from '@/stores/currentConversation';
 import {useConversationsStore} from "@/stores/conversations";
 import {useUserStore} from "@/stores/user.js";
 import {useCurrentMessagesStore} from "@/stores/currentMessages";
+import {Setting} from '@element-plus/icons-vue';
+import {ElCol, ElMessage, ElMessageBox, ElRow, ElSwitch} from "element-plus";
+
 
 // 选择的大模型
 const llm = ref(null); 
@@ -155,9 +160,19 @@ export default {
 
       heu_on,
 
+
+
       llm,
 
       model,
+
+      Setting,
+      settingsData: {
+        option1: false,
+        option2: false,
+      }, // 当前状态数据
+
+      showDialog: false,
 
       // 大模型系列选项
       llm_options: [
@@ -182,7 +197,16 @@ export default {
         ]
       },
 
-      postData: { conversation_id:null, query: 'Who are you?', llm: 'chatgpt', model:'gpt-4o', func_on:true, heu_on:true}, // 要发送到后端的数据
+      //启发式规则选择
+      heus: [false,false,false,false],
+
+      heu_list:{
+        "SIMPLEJUDGE":false,
+        "MULTIQUERY":true,
+        "FUNCTIONCALL":false,
+        "PEEREXAMINEE":false
+      },
+      postData: { conversation_id:null, query: 'Who are you?', llm: 'chatgpt', model:'gpt-4o', func_on:true, heu_on:true, heu_list:this.heu_list}, // 要发送到后端的数据
       response: null, // 用于保存后端返回的数据
 
       // 新消息输入框中的内容
@@ -264,6 +288,95 @@ export default {
       }
       this.postData.query = 'Who are you?'; // 重置 query 字段
     },
+
+    updateSettingsData(newData) {
+      this.settingsData = { ...newData };
+    },
+
+    openHeuSettings() {
+      ElMessageBox({
+        title: '启发式规则',
+        message: () =>
+            h('div', {style: 'align-items: center;' }, [
+              h(ElRow, { gutter: 20 , style: 'align-items: center;'}, [
+                h(ElCol, { span: 24 }, [
+                  h('div', { style: 'display: flex; align-items: center;' }, [
+                    h('span', { style: 'margin-right: 24px;' }, '函数调用策略\t'),  // 左侧注释文本
+                    h(ElSwitch, {
+                      modelValue: this.heu_list.FUNCTIONCALL,
+                      'onUpdate:modelValue': (val) => {
+                        this.heu_list.FUNCTIONCALL = val
+                      },
+                    })
+                  ])
+                ]),
+                h(ElCol, { span: 24 }, [
+                  h('div', { style: 'display: flex; align-items: center;' }, [
+                    h('span', { style: 'margin-right: 38px;' }, '多反馈策略\t'),
+                    h(ElSwitch, {
+                      modelValue: this.heu_list.MULTIQUERY,
+                      'onUpdate:modelValue': (val) => {
+                        this.heu_list.MULTIQUERY = val
+                      },
+                    })
+                  ])
+                ]),
+                h(ElCol, { span: 24 }, [
+                  h('div', { style: 'display: flex; align-items: center;' }, [
+                    h('span', { style: 'margin-right: 10px;' }, '多模型交互策略\t'),
+                    h(ElSwitch, {
+                      modelValue: this.heu_list.PEEREXAMINEE,
+                      'onUpdate:modelValue': (val) => {
+                        this.heu_list.PEEREXAMINEE = val
+                      },
+                    })
+                  ])
+                ]),
+                h(ElCol, { span: 24 }, [
+                  h('div', { style: 'display: flex; align-items: center;' }, [
+                    h('span', { style: 'margin-right: 24px;' }, '简约判定策略'),
+                    h(ElSwitch, {
+                      modelValue: this.heu_list.SIMPLEJUDGE,
+                      'onUpdate:modelValue': (val) => {
+                        this.heu_list.SIMPLEJUDGE = val
+                      },
+                    })
+                  ])
+                ]),
+              ])
+            ]),
+
+        // 其他配置选项
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        beforeClose: (action, instance, done) => {
+          // 在关闭弹窗前的清理工作
+          if (action === 'cancel') {
+            // 处理取消的操作
+            console.log('Cancelled');
+          }
+          done(); // 确保弹窗能够正常关闭
+        },
+      })
+          .then(() => {
+            ElMessage({
+              type: 'info',
+              message: 'Changes saved. Proceeding to a new route.',
+            })
+          })
+          .catch((action) => {
+            const message = action === 'cancel'
+                ? 'Changes discarded. Proceeding to a new route.'
+                : 'Stay in the current route';
+
+            ElMessage({
+              type: 'info',
+              message,
+            });
+          })
+
+    }
+
   },
   //钩子函数
   mounted() {
@@ -333,48 +446,7 @@ export default {
   }
   /* end 消息格式 */
 
-  /* 历史对话侧栏格式 */
-  .history-panel {
-    width: 250px;
-    background-color: #fff;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-    box-sizing: border-box;
-    height: 100%; /* 使侧栏的高度适应容器的高度 */
-    overflow-y: auto; /* 当内容溢出时出现上下滚动条 */
-  }
 
-  /* 标题样式 */
-  .history-panel h3 {
-    margin-top: 0;
-  }
-  
-
-  /* 历史对话列表样式 */
-  .history-panel ul {
-    list-style: none;
-    padding: 0;
-    margin: 0; /* 去掉外边距 */
-  }
-
-  /* 每一项的样式 */
-  .history-panel li {
-    cursor: pointer;
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-  }
-
-  /* 鼠标悬停样式 */
-  .history-panel li:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .history-panel li:hover {
-    background-color: #f1f1f1;
-  }
-  /* end 历史对话侧栏格式 */
 
   .chat-panel {
     flex-grow: 1;
@@ -409,7 +481,7 @@ export default {
     overflow-y: auto; /* 当文本超出时出现滚动条 */
   }
 
-  button {
+  .sendbutton {
     position: absolute;
     right: 10px; /* 将按钮定位到输入框右侧 */
     top: 50%;
@@ -423,7 +495,7 @@ export default {
   }
   
   /* 发送按钮鼠标悬停格式 */
-  button:hover {
+  .sendbutton:hover {
     background-color: #0056b3;
   }
 
