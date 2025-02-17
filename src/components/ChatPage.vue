@@ -134,6 +134,8 @@ export default {
     this.userStore = useUserStore();
     this.currentMessagesStore = useCurrentMessagesStore();
 
+    console.log(this.userStore.user);
+    console.log(this.userStore.user.user_id);
     this.conversationsStore.fetchData(this.userStore.user.user_id);
     this.conversations=this.conversationsStore.allConversations;
     this.currentMessagesStore.fetchMessages(this.conversations?.[0]?.id);
@@ -159,8 +161,6 @@ export default {
       func_on,
 
       heu_on,
-
-
 
       llm,
 
@@ -290,10 +290,6 @@ export default {
 
       }
       this.postData.query = 'Who are you?'; // 重置 query 字段
-    },
-
-    updateSettingsData(newData) {
-      this.settingsData = { ...newData };
     },
 
     openHeuSettings() {

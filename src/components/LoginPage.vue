@@ -56,11 +56,13 @@
           this.userStore.setLoading(true);
 
           try {
-            this.userStore.setUser(await this.userStore.login(this.loginForm.token, this.loginForm.password))
+            await this.userStore.login(this.loginForm.token, this.loginForm.password)
+            // this.userStore.setUser(await this.userStore.login(this.loginForm.token, this.loginForm.password))
             if (this.userStore.user) {
               ElMessage.success("登录成功！");
+              console.log(this.userStore.user);
               await this.conversationsStore.fetchData(this.userStore.user.user_id)
-              await this.$router.push("/");
+              await this.$router.push("/chat");
             } else {
               ElMessage.error("登录失败");
             }

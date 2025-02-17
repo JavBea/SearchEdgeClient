@@ -30,6 +30,7 @@ export const useUserStore = defineStore('currentUser', {
             try {
                 const response = await axios.post('http://127.0.0.1:5000/login',{"token":token, "password":password});
                 this.user = response.data;
+                console.log(response.data);
             } catch (err) {
                 this.err = err;
                 console.error(err);
