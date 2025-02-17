@@ -268,8 +268,6 @@ export default {
         this.postData.heu_list = this.heu_list;
 
 
-
-
         // 清空输入框
         this.newMessage = '';
       }
