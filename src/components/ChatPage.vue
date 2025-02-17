@@ -265,6 +265,11 @@ export default {
         this.postData.model = this.model;
         this.postData.func_on = this.func_on;
         this.postData.heu_on = this.heu_on;
+        this.postData.heu_list = this.heu_list;
+
+
+
+
         // 清空输入框
         this.newMessage = '';
       }
@@ -273,7 +278,7 @@ export default {
         // 使用 axios 发送 POST 请求
         const res = await axios.post('http://127.0.0.1:5000/llm/query', this.postData);
         // 保存后端返回的数据
-        this.response = res.data; 
+        this.response = res.data;
         // 将后端返回的消息添加到当前对话的消息列表中
         this.responseMessage = marked(this.response.content);
         const newMsg = { sender: 'system', message_content: this.responseMessage };
