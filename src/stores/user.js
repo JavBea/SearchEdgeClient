@@ -77,6 +77,7 @@ export const useUserStore = defineStore('currentUser', {
         getCurrentUserID(){
             return this.user_id;
         }
-    }
+    },
+    persist: true, // 启用持久化存储
     }
 );

@@ -5,15 +5,15 @@
     <!-- 右侧：对话部分 -->
     <div class="chat-panel">
 
-    <!-- 右上角登录链接 -->
-
-      <div v-if="userStore.user?.user_name" class="user-avatar">
+      <!-- 右上角登录链接 -->
+      <div v-if="userStore.user?.user_name" class="user-avatar" @click="drawer = true">
         <el-avatar class="avatar">{{ userStore.user.user_name.charAt(0).toUpperCase() }}</el-avatar>
       </div>
       <div v-else class="login-link">
         <router-link to="/login">登录</router-link>
       </div>
-    <!-- 四个选择设定小组件 -->
+
+      <!-- 四个选择设定小组件 -->
       <div class="choice-set-container">
         <!-- 第一个组件：选择大模型系列 -->
         <el-select
@@ -93,8 +93,52 @@
         <el-button @click="sendPostRequest" class=".sendbutton" round>发送</el-button>
       </div>
     </div>
+
+    <!-- 右侧抽屉 -->
+    <el-drawer
+        v-model="drawer"
+        title="I am the title"
+        size="15%"
+    >
+
+      <template #title>
+        <div>
+          <span style="font-weight: bold; font-size: 16px; color: black;">{{ this.userStore.user.user_name }}</span>
+          <div style="color: gray; font-size: 12px;">ID: {{ this.userStore.user.user_id }}</div>
+        </div>
+      </template>
+
+      <!-- 用户相关操作 -->
+      <el-menu
+          default-active="1"
+          class="el-menu-vertical-demo"
+      >
+        <el-menu-item index="1">
+          <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="15" height="15">
+            <path fill="currentColor" d="M512 512a192 192 0 1 0 0-384 192 192 0 0 0 0 384m0 64a256 256 0 1 1 0-512 256 256 0 0 1 0 512m320 320v-96a96 96 0 0 0-96-96H288a96 96 0 0 0-96 96v96a32 32 0 1 1-64 0v-96a160 160 0 0 1 160-160h448a160 160 0 0 1 160 160v96a32 32 0 1 1-64 0">
+            </path>
+          </svg>
+          <div style="padding: 7px;"></div>
+          <el-text>账户</el-text>
+        </el-menu-item>
+
+        <router-link to="/login" style="text-decoration: none;">
+          <el-menu-item index="2">
+            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="15" height="15">
+              <path fill="f51b1b " d="M352 159.872V230.4a352 352 0 1 0 320 0v-70.528A416.128 416.128 0 0 1 512 960a416 416 0 0 1-160-800.128z"></path>
+              <path fill="f51b1b " d="M512 64q32 0 32 32v320q0 32-32 32t-32-32V96q0-32 32-32"></path>
+            </svg>
+            <div style="padding: 7px;"></div>
+            <el-text>
+              登出
+            </el-text>
+          </el-menu-item>
+        </router-link>
+      </el-menu>
+    </el-drawer>
   </div>
 </template>
+
 
 <script>
 // 引入 axios
@@ -109,7 +153,7 @@ import {useCurrentConversationStore} from '@/stores/currentConversation';
 import {useConversationsStore} from "@/stores/conversations";
 import {useUserStore} from "@/stores/user.js";
 import {useCurrentMessagesStore} from "@/stores/currentMessages";
-import {Setting} from '@element-plus/icons-vue';
+import {Setting, Document, Menu, SwitchButton} from '@element-plus/icons-vue';
 import {ElCol, ElMessage, ElMessageBox, ElRow, ElSwitch} from "element-plus";
 
 
@@ -122,6 +166,10 @@ const model= ref(null);
 // 分别对应 “函数调用” 和 “启发式规则” 的开关状态
 const func_on = ref(true);
 const heu_on = ref(true);
+
+//右侧抽屉打开状态
+const drawer = ref(false);
+
 
 export default {
   name: 'ChatPage',
@@ -136,6 +184,7 @@ export default {
 
     console.log(this.userStore.user);
     console.log(this.userStore.user.user_id);
+
     this.conversationsStore.fetchData(this.userStore.user.user_id);
     this.conversations=this.conversationsStore.allConversations;
     this.currentMessagesStore.fetchMessages(this.conversations?.[0]?.id);
@@ -166,7 +215,11 @@ export default {
 
       model,
 
-      Setting,
+      drawer,
+
+      //icon
+      Setting, Document, Menu, SwitchButton,
+
       settingsData: {
         option1: false,
         option2: false,
@@ -202,7 +255,7 @@ export default {
 
       heu_list:{
         "SIMPLEJUDGE":false,
-        "MULTIQUERY":true,
+        "MULTIQUERY":false,
         "FUNCTIONCALL":false,
         "PEEREXAMINEE":false
       },
@@ -249,6 +302,7 @@ export default {
       console.log("选中的值是：", value);
       // 在这里可以执行其他逻辑
     },
+
     // 发送请求方法
     async sendPostRequest() {
       
@@ -277,8 +331,44 @@ export default {
         const res = await axios.post('http://127.0.0.1:5000/llm/query', this.postData);
         // 保存后端返回的数据
         this.response = res.data;
+        let content = this.response.content;
+
+        if(this.heu_on){
+          // 从响应数据中提取heu_result
+          const heuResult = this.response.heu_result;
+
+          // // 将heu_result的各字段命名为a、b、c、d
+          // const a = heuResult.SIMPLEJUDGE;
+          // const b = heuResult.MULTIQUERY;
+          // const c = heuResult.FUNCTIONCALL;
+          // const d = heuResult.PEEREXAMINEE;
+          //
+          // // 将所有的值放进一个数组中
+          // const values = [a, b, c, d];
+          //
+          // // 过滤掉null的值
+          // const filteredValues = values.filter(value => value !== null);
+          //
+          // // 计算非null值的平均值
+          // const average = filteredValues.length > 0 ? filteredValues.reduce((sum, value) => sum + value, 0) / filteredValues.length : null;
+          //
+          // content += `\n\n---\n\n`;
+          // content += `综合可信度: ${average}\n`;
+
+
+          // 将heu_result的内容追加到content尾部，并添加换行和分割线
+          content += `<br><br>\n\n---\n\n`;
+          content += `可靠性评定:<br>`;
+          content += `    ***简约判定策略:*** ${heuResult.SIMPLEJUDGE}<br>`;
+          content += `    ***多反馈策略:*** ${heuResult.MULTIQUERY}<br>`;
+          content += `    ***函数调用策略:*** ${heuResult.FUNCTIONCALL}<br>`;
+          content += `    ***多模型交互策略:*** ${heuResult.PEEREXAMINEE}<br>`;
+
+        }
+
+
         // 将后端返回的消息添加到当前对话的消息列表中
-        this.responseMessage = marked(this.response.content);
+        this.responseMessage = marked(content);
         const newMsg = { sender: 'system', message_content: this.responseMessage };
         this.currentMessagesStore.messages.push(newMsg);
 
@@ -292,6 +382,8 @@ export default {
       this.postData.query = 'Who are you?'; // 重置 query 字段
     },
 
+    //
+    // 打开启发式规则配置栏
     openHeuSettings() {
       ElMessageBox({
         title: '启发式规则',
@@ -359,17 +451,17 @@ export default {
       })
           .then(() => {
             ElMessage({
-              type: 'info',
-              message: 'Changes saved. Proceeding to a new route.',
+              type: 'success',
+              message: 'Changes saved.',
             })
           })
           .catch((action) => {
             const message = action === 'cancel'
-                ? 'Changes discarded. Proceeding to a new route.'
+                ? 'Changes discarded.'
                 : 'Stay in the current route';
 
             ElMessage({
-              type: 'info',
+              type: 'warning',
               message,
             });
           })
@@ -396,7 +488,7 @@ export default {
   .chat-container {
     display: flex;
     height: 96vh; /* 设置为视口高度，确保容器始终填充整个窗口 */
-    background-color: #f4f4f4;
+    background-color: #ffffff;/* #f4f4f4 */
     overflow: hidden; /* 防止出现滚动条 */
   }
 

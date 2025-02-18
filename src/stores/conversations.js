@@ -15,11 +15,23 @@ export const useConversationsStore = defineStore('conversations', {
     }),
     actions: {
         // 添加新的对话
-        addConversation(title) {
-            this.conversations.push({
-                title,
-                messages: [] // 新对话的消息是空的
-            });
+        async addConversation() {
+
+            this.loading = true;
+            this.err = null; // 每次请求前重置错误信息
+            try {
+                const response = await axios.post('http://127.0.0.1:5000/createconversation', {"user_id": this.user_id});
+                this.conversations.push({
+                    response
+                });
+            } catch (error) {
+                this.error = error;
+                console.error(error);
+            } finally {
+                this.loading = false;
+            }
+            console.log(this.conversations);
+
         },
 
         // 从后端获取全部新的对话

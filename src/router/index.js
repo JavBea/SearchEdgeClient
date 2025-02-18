@@ -38,4 +38,16 @@ const router = createRouter({
   routes  // 路由配置
 })
 
+
+// 路由守卫
+// router.beforeEach((to, from, next) => {
+//   // 如果是通过手动输入 URL 访问且路径不是根路径，跳转到根路径
+//   if (!router.app.$data.isCodeRedirect && to.path !== '/') {
+//     next('/');
+//   } else {
+//     next();  // 允许访问根路径和 chat 页面
+//   }
+// });
+
+
 export default router
