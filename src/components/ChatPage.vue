@@ -69,28 +69,32 @@
       </div>
 
       <!-- 显示对话内容 -->
-      <div class="chat-content">
-        <!-- 遍历 currentConversation.messages 数组，每个元素对应一条消息 -->
-        <div
-          v-for="(message, index) in currentMessages"
-          :key="index"
-          class="message"
-          :class="{
-            'system-message': message.sender === 'system',
-            'user-message': message.sender === 'user'
-          }"
-        >
-          <!-- 显示发送者的名字 -->
-          <strong>{{ message.sender }}:</strong>
-          <!-- 显示消息的内容 -->
-          <div v-html="message.message_content"></div>
+
+      <el-scrollbar>
+        <div class="chat-content">
+          <!-- 遍历 currentConversation.messages 数组，每个元素对应一条消息 -->
+          <div
+            v-for="(message, index) in currentMessages"
+            :key="index"
+            class="message"
+            :class="{
+              'system-message': message.sender === 'system',
+              'user-message': message.sender === 'user'
+            }"
+          >
+            <!-- 显示发送者的名字 -->
+            <strong>{{ message.sender }}:</strong>
+            <!-- 显示消息的内容 -->
+            <div v-html="message.message_content"></div>
+          </div>
+
         </div>
-      </div>
+      </el-scrollbar>
 
       <!-- 输入框 -->
       <div class="input-area">
         <textarea v-model="newMessage" placeholder="输入消息..." rows="3"></textarea>
-        <el-button @click="sendPostRequest" class=".sendbutton" round>发送</el-button>
+        <el-button @click="sendPostRequest" class=".sendbutton" v-loading="this.resLoading" round>发送</el-button>
       </div>
     </div>
 
@@ -170,6 +174,9 @@ const heu_on = ref(true);
 //右侧抽屉打开状态
 const drawer = ref(false);
 
+//loading boolean
+const resLoading =ref(false);
+
 
 export default {
   name: 'ChatPage',
@@ -217,13 +224,11 @@ export default {
 
       drawer,
 
+      //loading boolean
+      resLoading,
+
       //icon
       Setting, Document, Menu, SwitchButton,
-
-      settingsData: {
-        option1: false,
-        option2: false,
-      }, // 当前状态数据
 
       showDialog: false,
 
@@ -305,6 +310,8 @@ export default {
 
     // 发送请求方法
     async sendPostRequest() {
+
+      this.resLoading=true;
       
       // 检查 newMessage 是否为空或仅包含空格
       if (this.newMessage.trim()) {
@@ -333,7 +340,7 @@ export default {
         this.response = res.data;
         let content = this.response.content;
 
-        if(this.heu_on){
+        if(this.heu_on && (this.heu_list.FUNCTIONCALL||this.heu_list.MULTIQUERY||this.heu_list.SIMPLEJUDGE||this.heu_list.PEEREXAMINEE)){
           // 从响应数据中提取heu_result
           const heuResult = this.response.heu_result;
 
@@ -372,6 +379,8 @@ export default {
         const newMsg = { sender: 'system', message_content: this.responseMessage };
         this.currentMessagesStore.messages.push(newMsg);
 
+
+        this.resLoading=false;
         console.log('后端响应:', this.response);
 
       } catch (error) {

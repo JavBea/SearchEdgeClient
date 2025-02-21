@@ -6,27 +6,28 @@
     </el-menu-item>
 
 
-    <div class="history-panel" :class="{'collapsed': isCollapsed}">
-      <!-- 顶部区域，包含加号图标 -->
-      <div class="header">
-        <el-button :icon="OfficeBuilding" @click="togglePanel" circle />
-        <el-button :icon="Plus" @click="createConversation" circle />
+    <el-scrollbar>
+      <div class="history-panel" :class="{'collapsed': isCollapsed}">
+        <!-- 顶部区域，包含加号图标 -->
+        <div class="header">
+          <el-button :icon="OfficeBuilding" @click="togglePanel" circle />
+          <el-button :icon="Plus" @click="createConversation" circle />
+        </div>
+
+        <h3 v-if="!isCollapsed">历史对话</h3>
+        <ul v-if="!isCollapsed">
+          <li
+            v-for="conversation in conversations"
+            :key="conversation.id"
+            @click="selectConversation(conversation.id)"
+            :class="{ 'selected': conversation.id === this.currentConversationStore.getCurrentConversationId }"
+          >
+            {{ conversation.title }}
+          </li>
+        </ul>
+
       </div>
-
-      <h3 v-if="!isCollapsed">历史对话</h3>
-      <ul v-if="!isCollapsed">
-        <li
-          v-for="conversation in conversations"
-          :key="conversation.id"
-          @click="selectConversation(conversation.id)"
-          :class="{ 'selected': conversation.id === this.currentConversationStore.getCurrentConversationId }"
-        >
-          {{ conversation.title }}
-        </li>
-      </ul>
-
-    </div>
-
+    </el-scrollbar>
   </el-menu>
 
 </template>
@@ -90,7 +91,7 @@ export default {
   padding: 20px;
   box-sizing: border-box;
   height: 100%; /* 使侧栏的高度适应容器的高度 */
-  overflow-y: auto; /* 当内容溢出时出现上下滚动条 */
+  /* overflow-y: auto;  当内容溢出时出现上下滚动条 */
   transition: width 0.3s ease; /* 控制宽度的动画效果 */
 }
 
@@ -118,6 +119,7 @@ export default {
   list-style: none;
   padding: 0;
   margin: 0; /* 去掉外边距 */
+  overflow-y: auto; /* 添加垂直滚动条 */
 }
 
 /* 每一项的样式 */

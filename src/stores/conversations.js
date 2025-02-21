@@ -21,9 +21,8 @@ export const useConversationsStore = defineStore('conversations', {
             this.err = null; // 每次请求前重置错误信息
             try {
                 const response = await axios.post('http://127.0.0.1:5000/createconversation', {"user_id": this.user_id});
-                this.conversations.push({
-                    response
-                });
+                const newCon=response.data;
+                this.conversations.push(newCon);
             } catch (error) {
                 this.error = error;
                 console.error(error);
